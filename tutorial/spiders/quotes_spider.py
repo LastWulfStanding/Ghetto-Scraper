@@ -1,6 +1,31 @@
 
 import scrapy
 
+class QuotesSpider(scrapy.Spider):
+    # Name of the quotes, names of the spiders have to be unique to one another
+    name = "quotes"
+    
+    def start_requests(self):
+        url = 'http://quotes.toscrape.com/'     # The url that the spider starts with
+        tag = getattr(self, 'tag', None) 
+        if tag is not None:
+            url = url + 'tag/' + tag
+        yield scrapy.Request(url, self.parse)
+
+    def parse(self, response):
+        # for loop gets every <div class="quote" ...> for information extraction
+        for quote in response.css('div.quote'):
+            yield {
+                'text': quote.css('span.text::text').extract_first(),       # Extracts the text inside the <span class="text"> tags
+                'author': quote.css('small.author::text').extract_first(),  # Extracts the text inside the <small class="author"> tags 
+            }
+
+        for href in response.css('li.next a'):                  # get all the information within the tags <li class="next"><a> one by one
+            yield response.follow(href, callback=self.parse)    # response.follow uses the <a>'s href tags automatically
+
+### quotes spider #1
+'''
+import scrapy
 
 class QuotesSpider(scrapy.Spider):
     # Name of the quotes, names of the spiders have to be unique to one another
@@ -30,30 +55,32 @@ class QuotesSpider(scrapy.Spider):
             #-----#
             #next_page = response.urljoin(next_page)
             #yield scrapy.Request(next_page, callback=self.parse)
+'''
         
 
+### quotes spider #0
+'''
+import scrapy
 
-#import scrapy
+class QuotesSpider(scrapy.Spider):
+    name = "quotes"
 
-#class QuotesSpider(scrapy.Spider):
-    #name = "quotes"
+    def start_requests(self):
+        urls = [
+            'http://quotes.toscrape.com/page/1/',
+            'http://quotes.toscrape.com/page/2/',
+        ]
+        for url in urls:
+            yield scrapy.Request(url=url, callback=self.parse)
 
-    #def start_requests(self):
-        #urls = [
-            #'http://quotes.toscrape.com/page/1/',
-            #'http://quotes.toscrape.com/page/2/',
-        #]
-        #for url in urls:
-            #yield scrapy.Request(url=url, callback=self.parse)
-
-    #def parse(self, response):
-        #page = response.url.split("/")[-2]
-        #filename = 'quotes-%s.html' % page
-        #with open(filename, 'wb') as f:
-            #f.write(response.body)
-        #self.log('Saved file %s' % filename)
+    def parse(self, response):
+        page = response.url.split("/")[-2]
+        filename = 'quotes-%s.html' % page
+        with open(filename, 'wb') as f:
+            f.write(response.body)
+        self.log('Saved file %s' % filename)
 
 #instanceSpider = QuotesSpider
 #instanceSpider.start_requests()
-
+'''
 

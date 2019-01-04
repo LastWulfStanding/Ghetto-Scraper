@@ -8,6 +8,7 @@ from pprint import pprint
 filename = input("Name of file:\n")
 
 with open(filename + '.json') as f:
+    print(f)
     data = json.load(f)
     
 pprint(data)
