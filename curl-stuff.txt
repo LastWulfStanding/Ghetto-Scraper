@@ -1,0 +1,5 @@
+ 
+Remember:
+curl -H 'Client-ID: t1i9l82r7132ajvzrhiajbui53aym4' -X GET 'https://api.twitch.tv/helix/streams?game_id=33214&first=3'
+
+gives the information of the first 3 <Fortnite> streamers (from descending order)
