@@ -10,12 +10,17 @@ class WikipediaSpider(scrapy.Spider):
     # Name of the quotes, names of the spiders have to be unique to one another
     name = "wikipedia"
     
-    # The urls that the spider starts with
-    start_urls = [
-        'https://en.wikipedia.org/wiki/Main_Page',
-    ]
+    dest = None
+    
+    def start_requests(self):
+        Global dest
+        url = 'https://en.wikipedia.org/wiki/Main_Page'
+        dest = getattr(self, 'dest', None)
+        if dest is not None:
+            yield scrapy.Request(url, self.parse)
 
     def parse(self, response):
+        global dest
         d_links = dict()
         for bg in response.css('td.MainPageBG'):
             for l in bg.css("div a"):
@@ -23,6 +28,10 @@ class WikipediaSpider(scrapy.Spider):
                 href = l.css('a::attr(href)').extract_first()
                 d_links[name] = href
         yield d_links
+        
+    #def dest_selector(self, links):
+        #if  links.keys()
+        
 
             
         
