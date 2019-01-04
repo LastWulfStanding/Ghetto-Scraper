@@ -19,18 +19,21 @@ class QuotesSpider(scrapy.Spider):
                 'author': quote.css('small.author::text').extract_first(),  # Extracts the text inside the <small class="author"> tags 
                 'tags': quote.css('div.tags a.tag::text').extract(),        # Extracts the text inside the <div class="tags"><a class="tag"> tags
             }
+
+        for href in response.css('li.next a'):                  # get all the information within the tags <li class="next"><a> one by one
+            yield response.follow(href, callback=self.parse)    # response.follow uses the <a>'s href tags automatically
         
-        next_page = response.css('li.next a::attr(href)').extract_first()   # Extracts the href inside the <li class="next"><a> tags
-        if next_page is not None:
-            yield response.follow(next_page, callback=self.parse())
-            
+        
+        #next_page = response.css('li.next a::attr(href)').extract_first()   # Extracts the href inside the <li class="next"><a> tags
+        #if next_page is not None:
+            #yield response.follow(next_page, callback=self.parse())
+            #-----#
             #next_page = response.urljoin(next_page)
             #yield scrapy.Request(next_page, callback=self.parse)
         
 
 
 #import scrapy
-
 
 #class QuotesSpider(scrapy.Spider):
     #name = "quotes"
